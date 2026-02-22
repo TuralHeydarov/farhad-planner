@@ -8,9 +8,9 @@ class FarhadPlanner {
         this.currentDate = new Date();
         this.sectionPages = {
             daily: { unit: 'day', current: new Date() },
-            actions: { unit: 'month', current: new Date() },
+            actions: { unit: 'week', current: new Date(), weekIndex: 0 },
             locomotive: { unit: 'day', current: new Date() },
-            yearly: { unit: 'year', current: new Date() },
+            yearly: { unit: 'month', current: new Date() },
             priorities: { unit: 'week', current: this.getWeekNumber(new Date()) },
             frogs: { unit: 'month', current: new Date() },
             elephants: { unit: 'none', current: null },
@@ -95,19 +95,36 @@ class FarhadPlanner {
 
     handleTouchStart(e) {
         this.touchStartX = e.changedTouches[0].screenX;
+        this.touchStartY = e.changedTouches[0].screenY;
+        this.touchStartTarget = e.target;
     }
 
     handleTouchEnd(e) {
         this.touchEndX = e.changedTouches[0].screenX;
+        this.touchEndY = e.changedTouches[0].screenY;
         this.handleSwipe();
     }
 
     handleSwipe() {
-        const swipeThreshold = 50;
-        const swipeDistance = this.touchStartX - this.touchEndX;
+        const swipeThreshold = 80;  // Increased minimum distance
+        const swipeDistanceX = this.touchStartX - this.touchEndX;
+        const swipeDistanceY = Math.abs(this.touchStartY - this.touchEndY);
 
-        if (Math.abs(swipeDistance) > swipeThreshold) {
-            if (swipeDistance > 0) {
+        // Only trigger if horizontal swipe is dominant and meets minimum distance
+        if (Math.abs(swipeDistanceX) > swipeThreshold && Math.abs(swipeDistanceX) > swipeDistanceY * 2) {
+            // Check if touch started on a scrollable element
+            const touchTarget = this.touchStartTarget;
+            const scrollableContainer = touchTarget.closest('.actions-table-container, .yearly-table-container, table, .table-wrapper');
+            
+            if (scrollableContainer) {
+                // Check if the container actually has horizontal scroll
+                const hasHorizontalScroll = scrollableContainer.scrollWidth > scrollableContainer.clientWidth;
+                if (hasHorizontalScroll) {
+                    return; // Don't trigger page navigation
+                }
+            }
+
+            if (swipeDistanceX > 0) {
                 // Swipe left = next
                 this.navigatePage('next');
             } else {
@@ -164,7 +181,28 @@ class FarhadPlanner {
             newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
             section.current = newDate;
         } else if (section.unit === 'week') {
-            section.current += (direction === 'next' ? 1 : -1);
+            if (this.currentSection === 'actions') {
+                // Special handling for actions: navigate by weeks within month
+                const weeksInMonth = this.getWeeksInMonth(section.current);
+                section.weekIndex += (direction === 'next' ? 1 : -1);
+                
+                if (section.weekIndex >= weeksInMonth) {
+                    // Move to next month, first week
+                    const newDate = new Date(section.current);
+                    newDate.setMonth(newDate.getMonth() + 1);
+                    section.current = newDate;
+                    section.weekIndex = 0;
+                } else if (section.weekIndex < 0) {
+                    // Move to previous month, last week
+                    const newDate = new Date(section.current);
+                    newDate.setMonth(newDate.getMonth() - 1);
+                    section.current = newDate;
+                    section.weekIndex = this.getWeeksInMonth(newDate) - 1;
+                }
+            } else {
+                // Regular week navigation for other sections
+                section.current += (direction === 'next' ? 1 : -1);
+            }
         } else if (section.unit === 'year') {
             const newDate = new Date(section.current);
             newDate.setFullYear(newDate.getFullYear() + (direction === 'next' ? 1 : -1));
@@ -185,7 +223,11 @@ class FarhadPlanner {
         } else if (section.unit === 'month') {
             infoText = this.formatMonth(section.current);
         } else if (section.unit === 'week') {
-            infoText = `Неделя ${section.current}`;
+            if (this.currentSection === 'actions') {
+                infoText = `${this.formatMonth(section.current)} — Неделя ${section.weekIndex + 1}`;
+            } else {
+                infoText = `Неделя ${section.current}`;
+            }
         } else if (section.unit === 'year') {
             infoText = section.current.getFullYear().toString();
         } else {
@@ -221,7 +263,12 @@ class FarhadPlanner {
                 } else if (sectionData.unit === 'month') {
                     dateText = this.formatMonth(sectionData.current);
                 } else if (sectionData.unit === 'week') {
-                    dateText = `Неделя ${sectionData.current}`;
+                    if (section === 'actions') {
+                        const weekRange = this.getWeekDateRange(sectionData.current, sectionData.weekIndex);
+                        dateText = `${this.formatMonth(sectionData.current)} — Неделя ${sectionData.weekIndex + 1} (${weekRange})`;
+                    } else {
+                        dateText = `Неделя ${sectionData.current}`;
+                    }
                 } else if (sectionData.unit === 'year') {
                     dateText = sectionData.current.getFullYear().toString();
                 }
@@ -476,7 +523,7 @@ class FarhadPlanner {
         directions.forEach((direction, dirIndex) => {
             // Direction row
             const dirRow = document.createElement('tr');
-            dirRow.innerHTML = `<td class="direction-name" colspan="32">${direction}</td>`;
+            dirRow.innerHTML = `<td class="direction-name" colspan="9">${direction}</td>`;
             tableBody.appendChild(dirRow);
 
             // Items rows (default 4)
@@ -487,15 +534,24 @@ class FarhadPlanner {
                            data-dir="${dirIndex}" data-item="${itemIndex}">
                 </td>`;
                 
-                // Add 31 day columns
-                for (let day = 1; day <= 31; day++) {
+                // Add 7 day columns for the week
+                for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
                     html += `<td><input type="number" min="0" max="5" placeholder="0" 
-                                data-dir="${dirIndex}" data-item="${itemIndex}" data-day="${day}"></td>`;
+                                data-dir="${dirIndex}" data-item="${itemIndex}" data-weekday="${dayOfWeek}"></td>`;
                 }
                 
                 itemRow.innerHTML = html;
                 tableBody.appendChild(itemRow);
             }
+
+            // Add button row for this direction
+            const addRow = document.createElement('tr');
+            addRow.innerHTML = `
+                <td colspan="8">
+                    <button class="add-habit-btn" onclick="farhadPlanner.addHabitRow(${dirIndex})">+ Добавить</button>
+                </td>
+            `;
+            tableBody.appendChild(addRow);
         });
 
         // Add header days after directions are set
@@ -512,25 +568,30 @@ class FarhadPlanner {
                 headerRow.removeChild(headerRow.lastChild);
             }
             
-            // Add day headers
-            for (let day = 1; day <= 31; day++) {
+            // Add weekday headers
+            const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+            weekdays.forEach(weekday => {
                 const th = document.createElement('th');
-                th.textContent = day;
-                th.style.minWidth = '40px';
+                th.textContent = weekday;
+                th.style.minWidth = '50px';
                 headerRow.appendChild(th);
-            }
+            });
         }
     }
 
     loadActionsData() {
-        const monthKey = this.getMonthKey(this.sectionPages.actions.current);
-        const actionsData = this.data.actions[monthKey] || {};
+        const section = this.sectionPages.actions;
+        const weekKey = this.getWeekKey(section.current, section.weekIndex);
+        const actionsData = this.data.actions[weekKey] || {};
 
         const actionsDate = document.getElementById('actionsDate');
-        if (actionsDate) actionsDate.textContent = this.formatMonth(this.sectionPages.actions.current);
+        if (actionsDate) {
+            const weekRange = this.getWeekDateRange(section.current, section.weekIndex);
+            actionsDate.textContent = `${this.formatMonth(section.current)} — Неделя ${section.weekIndex + 1} (${weekRange})`;
+        }
 
         // Load direction items
-        const itemInputs = document.querySelectorAll('[data-dir][data-item]:not([data-day])');
+        const itemInputs = document.querySelectorAll('[data-dir][data-item]:not([data-weekday])');
         itemInputs.forEach(input => {
             const dir = input.dataset.dir;
             const item = input.dataset.item;
@@ -538,23 +599,24 @@ class FarhadPlanner {
             input.value = actionsData[key] || '';
         });
 
-        // Load day ratings
-        const dayInputs = document.querySelectorAll('[data-dir][data-item][data-day]');
+        // Load weekday ratings
+        const dayInputs = document.querySelectorAll('[data-dir][data-item][data-weekday]');
         dayInputs.forEach(input => {
             const dir = input.dataset.dir;
             const item = input.dataset.item;
-            const day = input.dataset.day;
-            const key = `rating_${dir}_${item}_${day}`;
+            const weekday = input.dataset.weekday;
+            const key = `rating_${dir}_${item}_${weekday}`;
             input.value = actionsData[key] || '';
         });
     }
 
     saveActionsData() {
-        const monthKey = this.getMonthKey(this.sectionPages.actions.current);
+        const section = this.sectionPages.actions;
+        const weekKey = this.getWeekKey(section.current, section.weekIndex);
         const actionsData = {};
 
         // Save direction items
-        const itemInputs = document.querySelectorAll('[data-dir][data-item]:not([data-day])');
+        const itemInputs = document.querySelectorAll('[data-dir][data-item]:not([data-weekday])');
         itemInputs.forEach(input => {
             const dir = input.dataset.dir;
             const item = input.dataset.item;
@@ -562,17 +624,17 @@ class FarhadPlanner {
             actionsData[key] = input.value;
         });
 
-        // Save day ratings
-        const dayInputs = document.querySelectorAll('[data-dir][data-item][data-day]');
+        // Save weekday ratings
+        const dayInputs = document.querySelectorAll('[data-dir][data-item][data-weekday]');
         dayInputs.forEach(input => {
             const dir = input.dataset.dir;
             const item = input.dataset.item;
-            const day = input.dataset.day;
-            const key = `rating_${dir}_${item}_${day}`;
+            const weekday = input.dataset.weekday;
+            const key = `rating_${dir}_${item}_${weekday}`;
             actionsData[key] = input.value;
         });
 
-        this.data.actions[monthKey] = actionsData;
+        this.data.actions[weekKey] = actionsData;
         this.saveData();
     }
 
@@ -646,29 +708,37 @@ class FarhadPlanner {
        =============================================== */
 
     setupYearlyTable() {
-        const tableBody = document.getElementById('yearlyTableBody');
-        if (!tableBody) return;
-
-        for (let day = 1; day <= 31; day++) {
-            const row = document.createElement('tr');
-            let html = `<td>${day}</td>`;
-            
-            for (let month = 0; month < 12; month++) {
-                html += `<td><input type="text" data-day="${day}" data-month="${month}"></td>`;
-            }
-            
-            row.innerHTML = html;
-            tableBody.appendChild(row);
-        }
+        // This will be dynamically updated in loadYearlyData()
+        // since we're now showing one month at a time
     }
 
     loadYearlyData() {
-        const year = this.sectionPages.yearly.current.getFullYear();
+        const monthDate = this.sectionPages.yearly.current;
+        const year = monthDate.getFullYear();
+        const month = monthDate.getMonth();
         const yearlyData = this.data.yearly[year] || {};
 
         const yearDate = document.getElementById('yearlyDate');
-        if (yearDate) yearDate.textContent = `${year} г.`;
+        if (yearDate) yearDate.textContent = this.formatMonth(monthDate);
 
+        // Rebuild the table for this month
+        const tableBody = document.getElementById('yearlyTableBody');
+        if (!tableBody) return;
+
+        tableBody.innerHTML = '';
+        
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="day-number">День ${day}</td>
+                <td><input type="text" data-day="${day}" data-month="${month}" placeholder="План на день ${day}"></td>
+            `;
+            tableBody.appendChild(row);
+        }
+
+        // Load data for this month
         const inputs = document.querySelectorAll('#yearlyTable input');
         inputs.forEach(input => {
             const day = input.dataset.day;
@@ -1115,6 +1185,97 @@ class FarhadPlanner {
         const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
         const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
         return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+    }
+
+    getWeeksInMonth(date) {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        
+        const firstWeek = Math.ceil((firstDay.getDate() - firstDay.getDay() + 1) / 7);
+        const lastWeek = Math.ceil((lastDay.getDate() - lastDay.getDay() + 1) / 7);
+        
+        return Math.max(4, Math.ceil((lastDay.getDate() + firstDay.getDay()) / 7));
+    }
+
+    getWeekKey(date, weekIndex) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-week-${weekIndex}`;
+    }
+
+    getWeekDateRange(date, weekIndex) {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        
+        // Calculate the date range for this week of the month
+        const firstDayOfMonth = new Date(year, month, 1);
+        const startOfWeek = new Date(firstDayOfMonth);
+        startOfWeek.setDate(1 + (weekIndex * 7) - firstDayOfMonth.getDay() + 1);
+        
+        // Ensure start is not before the month starts
+        if (startOfWeek.getMonth() !== month) {
+            startOfWeek.setDate(1);
+        }
+        
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        
+        // Ensure end is not after the month ends
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+        if (endOfWeek > lastDayOfMonth) {
+            endOfWeek.setTime(lastDayOfMonth.getTime());
+        }
+        
+        return `${startOfWeek.getDate()}-${endOfWeek.getDate()}`;
+    }
+
+    addHabitRow(dirIndex) {
+        const directions = ['Физическая область', 'Семья', 'Работа/Бизнес', 'Самообразование/Духовность'];
+        const tableBody = document.getElementById('actionsTableBody');
+        if (!tableBody) return;
+
+        // Find the correct position to insert (before the add button row of this direction)
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+        let insertIndex = 0;
+        let currentDir = -1;
+        
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            if (row.querySelector('.direction-name')) {
+                currentDir++;
+            }
+            if (currentDir === dirIndex && row.querySelector('.add-habit-btn')) {
+                insertIndex = i;
+                break;
+            }
+        }
+
+        // Count existing items for this direction
+        let itemCount = 0;
+        for (let i = 0; i < insertIndex; i++) {
+            if (rows[i].querySelector('[data-dir]') && 
+                rows[i].querySelector('[data-dir]').dataset.dir == dirIndex) {
+                itemCount++;
+            }
+        }
+
+        const newRow = document.createElement('tr');
+        let html = `<td class="habit-item">
+            <input type="text" placeholder="Привычка/Действие ${itemCount + 1}" 
+                   data-dir="${dirIndex}" data-item="${itemCount}">
+        </td>`;
+        
+        // Add 7 day columns for the week
+        for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+            html += `<td><input type="number" min="0" max="5" placeholder="0" 
+                        data-dir="${dirIndex}" data-item="${itemCount}" data-weekday="${dayOfWeek}"></td>`;
+        }
+        
+        newRow.innerHTML = html;
+        tableBody.insertBefore(newRow, rows[insertIndex]);
+
+        // Save the updated structure
+        this.saveActionsData();
     }
 }
 

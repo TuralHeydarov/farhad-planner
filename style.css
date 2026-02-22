@@ -627,6 +627,101 @@ button:active {
     padding: 0.25rem;
 }
 
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    /* Actions table mobile optimization */
+    .actions-table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .actions-table {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .actions-table th,
+    .actions-table td {
+        min-width: 50px;
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .habit-item input {
+        min-width: 120px;
+        font-size: 0.8rem;
+    }
+    
+    /* Yearly table mobile optimization */
+    .yearly-table-container {
+        overflow: visible;
+        max-height: none;
+        border: none;
+    }
+    
+    .yearly-table {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .yearly-table th:first-child,
+    .yearly-table td:first-child {
+        position: static;
+        width: auto;
+    }
+    
+    .day-number {
+        font-weight: 600;
+        background: var(--accent-light);
+        text-align: left;
+        padding: 0.75rem 1rem;
+    }
+    
+    .yearly-table td:nth-child(2) {
+        padding: 0.5rem;
+    }
+    
+    .yearly-table input[type="text"] {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+        border: 1px solid var(--paper-line);
+        border-radius: 4px;
+    }
+    
+    /* Add habit button */
+    .add-habit-btn {
+        background: var(--accent-light);
+        border: 1px solid var(--accent-secondary);
+        color: var(--accent-primary);
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        margin: 0.25rem;
+        transition: all 0.2s ease;
+    }
+    
+    .add-habit-btn:hover {
+        background: var(--accent-secondary);
+        color: white;
+    }
+    
+    /* Improve swipe areas */
+    .page-content {
+        overflow-x: hidden; /* Prevent accidental horizontal scroll */
+    }
+    
+    /* Better touch targets */
+    input[type="number"] {
+        min-height: 44px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    input[type="text"] {
+        min-height: 44px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
+
 /* 5. Priorities (Приоритетность задач) */
 .priorities-grid {
     display: grid;
