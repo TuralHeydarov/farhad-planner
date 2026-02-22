@@ -3,420 +3,352 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ежедневник успеха | Farhad Talaybekovich</title>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    
-    <!-- StPageFlip CDN -->
-    <script src="https://unpkg.com/page-flip/dist/js/page-flip.browser.js"></script>
-    
+    <title>Farhad Planner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>📓 ЕЖЕДНЕВНИК УСПЕХА</h1>
-            <p class="branding">FARHAD TAALAYBEKOVICH</p>
+    <!-- Header with branding -->
+    <header>
+        <h1>FARHAD TAALAYBEKOVICH</h1>
+        <div class="subtitle">Personal Planner System</div>
+    </header>
+
+    <!-- Top navigation tabs -->
+    <nav class="main-nav">
+        <div class="nav-scroll">
+            <button class="nav-tab active" data-section="daily">📅 Ежедневник</button>
+            <button class="nav-tab" data-section="actions">✅ Карточка действий</button>
+            <button class="nav-tab" data-section="locomotive">🚂 Принцип паровоза</button>
+            <button class="nav-tab" data-section="yearly">📆 Годовой план</button>
+            <button class="nav-tab" data-section="priorities">🎯 Приоритетность задач</button>
+            <button class="nav-tab" data-section="frogs">🐸 Лягушки</button>
+            <button class="nav-tab" data-section="elephants">🐘 Слоны</button>
+            <button class="nav-tab" data-section="plans">📋 Планы</button>
+        </div>
+    </nav>
+
+    <!-- Main content container -->
+    <main class="main-content">
+        <!-- Page flip navigation -->
+        <div class="page-nav" id="pageNav">
+            <button class="page-btn" id="prevPage">◀</button>
+            <div class="page-info" id="pageInfo"></div>
+            <button class="page-btn" id="nextPage">▶</button>
         </div>
 
-        <!-- Navigation -->
-        <div class="nav">
-            <button class="nav-btn prev-btn" id="prevBtn">← Назад</button>
-            <span class="page-indicator">
-                Страница <span id="currentPage">1</span> из <span id="totalPages">10</span>
-            </span>
-            <button class="nav-btn next-btn" id="nextBtn">Вперёд →</button>
+        <!-- Section containers -->
+        <div class="section-container">
+            <!-- 1. Ежедневник -->
+            <section id="daily" class="section active">
+                <div class="page-content">
+                    <div class="date-header" id="dailyDate"></div>
+                    
+                    <div class="daily-layout">
+                        <!-- Left column -->
+                        <div class="daily-left">
+                            <!-- Важные срочные -->
+                            <div class="section-block">
+                                <h3>Важные срочные</h3>
+                                <div class="urgent-tasks">
+                                    <div class="task-item" data-index="0">
+                                        <input type="checkbox" id="urgent0">
+                                        <input type="text" placeholder="Важная срочная задача 1">
+                                    </div>
+                                    <div class="task-item" data-index="1">
+                                        <input type="checkbox" id="urgent1">
+                                        <input type="text" placeholder="Важная срочная задача 2">
+                                    </div>
+                                    <div class="task-item" data-index="2">
+                                        <input type="checkbox" id="urgent2">
+                                        <input type="text" placeholder="Важная срочная задача 3">
+                                    </div>
+                                    <div class="task-item" data-index="3">
+                                        <input type="checkbox" id="urgent3">
+                                        <input type="text" placeholder="Важная срочная задача 4">
+                                    </div>
+                                    <div class="task-item" data-index="4">
+                                        <input type="checkbox" id="urgent4">
+                                        <input type="text" placeholder="Важная срочная задача 5">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Жёсткие планы -->
+                            <div class="section-block">
+                                <h3>Жёсткие планы</h3>
+                                <div class="schedule" id="scheduleContainer"></div>
+                            </div>
+
+                            <!-- Гибкие планы -->
+                            <div class="section-block">
+                                <h3>Гибкие планы</h3>
+                                <div class="flexible-plans" id="flexiblePlans">
+                                    <button class="add-btn" onclick="addFlexibleTask()">+ Добавить задачу</button>
+                                </div>
+                            </div>
+
+                            <!-- Аффирмация -->
+                            <div class="section-block">
+                                <h3>Аффирмация</h3>
+                                <textarea class="lined-textarea" id="affirmation" placeholder="Напишите вашу аффирмацию..."></textarea>
+                            </div>
+
+                            <!-- Физическая область -->
+                            <div class="section-block">
+                                <h3>Физическая область</h3>
+                                <textarea class="lined-textarea" id="physical" placeholder="Планы по физическому развитию..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Right column -->
+                        <div class="daily-right">
+                            <div class="evaluation">
+                                <h4>Оценка дня</h4>
+                                <input type="range" min="0" max="5" value="3" class="day-rating" id="dayRating">
+                                <span id="ratingValue">3</span>/5
+                            </div>
+
+                            <div class="checkboxes-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="books">
+                                    <label for="books">Книги</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="audio">
+                                    <label for="audio">Аудио</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="video">
+                                    <label for="video">Видео</label>
+                                </div>
+                            </div>
+
+                            <div class="text-sections">
+                                <div class="text-section">
+                                    <label>Хронометраж</label>
+                                    <textarea id="timeTracking" placeholder="Анализ времени..."></textarea>
+                                </div>
+                                <div class="text-section">
+                                    <label>Цели</label>
+                                    <textarea id="goals" placeholder="Цели дня..."></textarea>
+                                </div>
+                                <div class="text-section">
+                                    <label>Принципы</label>
+                                    <textarea id="principles" placeholder="Принципы..."></textarea>
+                                </div>
+                                <div class="text-section">
+                                    <label>Дневник успеха</label>
+                                    <textarea id="successDiary" placeholder="Что удалось сегодня..."></textarea>
+                                </div>
+                                <div class="text-section">
+                                    <label>Осознание</label>
+                                    <textarea id="awareness" placeholder="Что осознал..."></textarea>
+                                </div>
+                                <div class="text-section">
+                                    <label>Погрешность/Поглотители</label>
+                                    <textarea id="timeWasters" placeholder="Что отвлекало..."></textarea>
+                                </div>
+                                <div class="text-section">
+                                    <label>Ошибки</label>
+                                    <textarea id="mistakes" placeholder="Ошибки дня..."></textarea>
+                                </div>
+                                <div class="text-section">
+                                    <label>Решение/улучшение</label>
+                                    <textarea id="improvements" placeholder="Как улучшить..."></textarea>
+                                </div>
+                                <div class="text-section">
+                                    <label>Идеи-решения</label>
+                                    <textarea id="ideas" placeholder="Новые идеи..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Карточка действий -->
+            <section id="actions" class="section">
+                <div class="page-content">
+                    <div class="date-header" id="actionsDate"></div>
+                    <div class="actions-table-container">
+                        <table class="actions-table" id="actionsTable">
+                            <thead>
+                                <tr>
+                                    <th class="direction-col">Направления</th>
+                                </tr>
+                            </thead>
+                            <tbody id="actionsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Принцип паровоза -->
+            <section id="locomotive" class="section">
+                <div class="page-content">
+                    <div class="date-header" id="locomotiveDate"></div>
+                    <div class="locomotive-grid">
+                        <div class="grid-header">
+                            <div class="time-col">Время</div>
+                            <div class="direction-col">Физическая область</div>
+                            <div class="direction-col">Семья</div>
+                            <div class="direction-col">Работа/Бизнес</div>
+                            <div class="direction-col">Самообразование/Духовность</div>
+                        </div>
+                        <div class="grid-body" id="locomotiveGrid"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Годовой план -->
+            <section id="yearly" class="section">
+                <div class="page-content">
+                    <div class="date-header" id="yearlyDate"></div>
+                    <div class="yearly-table-container">
+                        <table class="yearly-table" id="yearlyTable">
+                            <thead>
+                                <tr>
+                                    <th>День</th>
+                                    <th>Янв</th>
+                                    <th>Фев</th>
+                                    <th>Мар</th>
+                                    <th>Апр</th>
+                                    <th>Май</th>
+                                    <th>Июн</th>
+                                    <th>Июл</th>
+                                    <th>Авг</th>
+                                    <th>Сен</th>
+                                    <th>Окт</th>
+                                    <th>Ноя</th>
+                                    <th>Дек</th>
+                                </tr>
+                            </thead>
+                            <tbody id="yearlyTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Приоритетность задач -->
+            <section id="priorities" class="section">
+                <div class="page-content">
+                    <div class="date-header" id="prioritiesDate"></div>
+                    <div class="priorities-grid">
+                        <div class="quadrant" data-type="A">
+                            <h3>A) Важные срочные</h3>
+                            <div class="task-list" data-quadrant="A"></div>
+                            <button class="add-btn" onclick="addPriorityTask('A')">+ Добавить задачу</button>
+                        </div>
+                        <div class="quadrant" data-type="B">
+                            <h3>B) Важные не срочные</h3>
+                            <div class="task-list" data-quadrant="B"></div>
+                            <button class="add-btn" onclick="addPriorityTask('B')">+ Добавить задачу</button>
+                        </div>
+                        <div class="quadrant" data-type="C">
+                            <h3>C) Срочные не важные</h3>
+                            <div class="task-list" data-quadrant="C"></div>
+                            <button class="add-btn" onclick="addPriorityTask('C')">+ Добавить задачу</button>
+                        </div>
+                        <div class="quadrant" data-type="D">
+                            <h3>D) Не срочные не важные</h3>
+                            <div class="task-list" data-quadrant="D"></div>
+                            <button class="add-btn" onclick="addPriorityTask('D')">+ Добавить задачу</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. Лягушки -->
+            <section id="frogs" class="section">
+                <div class="page-content">
+                    <div class="date-header" id="frogsDate"></div>
+                    <div class="frogs-container">
+                        <div class="frogs-section">
+                            <h3>Активные лягушки</h3>
+                            <div class="frog-input">
+                                <input type="text" id="newFrogText" placeholder="Добавить новую лягушку...">
+                                <button onclick="addFrog()">Добавить</button>
+                            </div>
+                            <div class="frogs-list" id="activeFrogs"></div>
+                        </div>
+                        <div class="frogs-section">
+                            <h3>Завершённые лягушки</h3>
+                            <div class="frogs-list" id="completedFrogs"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. Слоны -->
+            <section id="elephants" class="section">
+                <div class="page-content">
+                    <div class="date-header">Слоны</div>
+                    <div class="elephants-tabs">
+                        <button class="tab-btn active" data-tab="active">Активные</button>
+                        <button class="tab-btn" data-tab="completed">Завершённые</button>
+                    </div>
+                    
+                    <div class="elephant-input">
+                        <input type="text" id="newElephantName" placeholder="Название проекта...">
+                        <button onclick="addElephant()">Добавить слона</button>
+                    </div>
+
+                    <div class="elephants-content">
+                        <div class="elephant-tab-content active" data-tab="active">
+                            <div class="elephants-list" id="activeElephants"></div>
+                        </div>
+                        <div class="elephant-tab-content" data-tab="completed">
+                            <div class="elephants-list" id="completedElephants"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. Планы -->
+            <section id="plans" class="section">
+                <div class="page-content">
+                    <div class="date-header" id="plansDate"></div>
+                    <div class="plans-container">
+                        <div class="plan-section">
+                            <h3>Годовой план</h3>
+                            <textarea class="lined-textarea" id="yearPlan" placeholder="Планы на год..."></textarea>
+                        </div>
+                        
+                        <div class="plan-section">
+                            <h3>Месячный план</h3>
+                            <select id="monthSelector">
+                                <option value="0">Январь</option>
+                                <option value="1">Февраль</option>
+                                <option value="2">Март</option>
+                                <option value="3">Апрель</option>
+                                <option value="4">Май</option>
+                                <option value="5">Июнь</option>
+                                <option value="6">Июль</option>
+                                <option value="7">Август</option>
+                                <option value="8">Сентябрь</option>
+                                <option value="9">Октябрь</option>
+                                <option value="10">Ноябрь</option>
+                                <option value="11">Декабрь</option>
+                            </select>
+                            <textarea class="lined-textarea" id="monthPlan" placeholder="Планы на выбранный месяц..."></textarea>
+                        </div>
+                        
+                        <div class="plan-section">
+                            <h3>Недельный план</h3>
+                            <div class="weekly-tasks" id="weeklyTasks">
+                                <button class="add-btn" onclick="addWeeklyTask()">+ Добавить задачу</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
+    </main>
 
-        <!-- Book Container -->
-        <div class="book-container">
-            <div id="book">
-                
-                <!-- Page 1: Ежедневник (Daily Planner) -->
-                <div class="page">
-                    <div class="page-content daily-planner">
-                        <div class="page-header">
-                            <h2>📅 Ежедневник</h2>
-                            <div class="date-nav">
-                                <button id="prevDay">←</button>
-                                <input type="date" id="currentDate" />
-                                <button id="nextDay">→</button>
-                                <button id="today">Сегодня</button>
-                            </div>
-                        </div>
-                        
-                        <div class="daily-content">
-                            <div class="left-column">
-                                <!-- Важные срочные -->
-                                <div class="section">
-                                    <h3>Важные срочные</h3>
-                                    <div id="urgentTasks">
-                                        <!-- Dynamically generated -->
-                                    </div>
-                                </div>
-
-                                <!-- Жёсткие планы -->
-                                <div class="section">
-                                    <h3>Жёсткие планы</h3>
-                                    <div id="hourlyPlans" class="hourly-plans">
-                                        <!-- Dynamically generated -->
-                                    </div>
-                                </div>
-
-                                <!-- Гибкие планы -->
-                                <div class="section">
-                                    <h3>Гибкие планы</h3>
-                                    <div id="flexiblePlans">
-                                        <button id="addFlexiblePlan" class="add-btn">+ Добавить</button>
-                                    </div>
-                                </div>
-
-                                <!-- Аффирмация -->
-                                <div class="section">
-                                    <h3>Аффирмация</h3>
-                                    <textarea id="affirmation" class="lined-textarea" placeholder="Позитивное утверждение на день..."></textarea>
-                                </div>
-
-                                <!-- Физическая область -->
-                                <div class="section">
-                                    <h3>Физическая область</h3>
-                                    <textarea id="physicalArea" class="lined-textarea" placeholder="Упражнения, здоровье, энергия..."></textarea>
-                                </div>
-                            </div>
-
-                            <div class="right-column">
-                                <!-- Оценка дня -->
-                                <div class="section">
-                                    <h3>Оценка дня</h3>
-                                    <div class="rating-container">
-                                        <input type="range" id="dayRating" min="0" max="5" value="0" class="rating-slider">
-                                        <span id="ratingValue">0</span>/5
-                                    </div>
-                                </div>
-
-                                <!-- Книги/Аудио/Видео -->
-                                <div class="section">
-                                    <h3>Развитие</h3>
-                                    <label><input type="checkbox" id="books"> Книги</label>
-                                    <label><input type="checkbox" id="audio"> Аудио</label>
-                                    <label><input type="checkbox" id="video"> Видео</label>
-                                </div>
-
-                                <!-- Хронометраж -->
-                                <div class="section">
-                                    <h3>Хронометраж</h3>
-                                    <div id="timeTracking">
-                                        <button id="addTimeEntry" class="add-btn">+ Добавить запись</button>
-                                    </div>
-                                </div>
-
-                                <!-- Text fields -->
-                                <div class="section">
-                                    <h3>Цели</h3>
-                                    <textarea id="goals" class="lined-textarea" placeholder="Цели на день..."></textarea>
-                                </div>
-
-                                <div class="section">
-                                    <h3>Принципы</h3>
-                                    <textarea id="principles" class="lined-textarea" placeholder="Принципы, которыми руководствуюсь..."></textarea>
-                                </div>
-
-                                <div class="section">
-                                    <h3>Дневник успеха</h3>
-                                    <textarea id="successDiary" class="lined-textarea" placeholder="Что удалось сегодня..."></textarea>
-                                </div>
-
-                                <div class="section">
-                                    <h3>Осознание</h3>
-                                    <textarea id="awareness" class="lined-textarea" placeholder="Что осознал сегодня..."></textarea>
-                                </div>
-
-                                <div class="section">
-                                    <h3>Погрешность/Поглотители</h3>
-                                    <textarea id="timeWasters" class="lined-textarea" placeholder="Что отвлекало, мешало..."></textarea>
-                                </div>
-
-                                <div class="section">
-                                    <h3>Ошибки</h3>
-                                    <textarea id="mistakes" class="lined-textarea" placeholder="Ошибки, допущенные за день..."></textarea>
-                                </div>
-
-                                <div class="section">
-                                    <h3>Решение/улучшение</h3>
-                                    <textarea id="solutions" class="lined-textarea" placeholder="Как исправить, что улучшить..."></textarea>
-                                </div>
-
-                                <div class="section">
-                                    <h3>Идеи-решения</h3>
-                                    <textarea id="ideas" class="lined-textarea" placeholder="Новые идеи и решения..."></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Page 2: Карточка действий (Habit Tracker) - Page 1 of 3 -->
-                <div class="page">
-                    <div class="page-content habit-tracker">
-                        <div class="page-header">
-                            <h2>✅ Карточка действий (Стр. 1/3)</h2>
-                            <div class="month-nav">
-                                <button id="prevMonth1">←</button>
-                                <select id="monthSelect1">
-                                    <!-- Dynamically generated -->
-                                </select>
-                                <select id="yearSelect1">
-                                    <!-- Dynamically generated -->
-                                </select>
-                                <button id="nextMonth1">→</button>
-                            </div>
-                        </div>
-                        
-                        <div class="habit-table-container">
-                            <table class="habit-table" id="habitTable1">
-                                <!-- Dynamically generated -->
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Page 3: Карточка действий - Page 2 of 3 -->
-                <div class="page">
-                    <div class="page-content habit-tracker">
-                        <div class="page-header">
-                            <h2>✅ Карточка действий (Стр. 2/3)</h2>
-                            <div class="month-nav">
-                                <button id="prevMonth2">←</button>
-                                <select id="monthSelect2"></select>
-                                <select id="yearSelect2"></select>
-                                <button id="nextMonth2">→</button>
-                            </div>
-                        </div>
-                        
-                        <div class="habit-table-container">
-                            <table class="habit-table" id="habitTable2">
-                                <!-- Dynamically generated -->
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Page 4: Карточка действий - Page 3 of 3 -->
-                <div class="page">
-                    <div class="page-content habit-tracker">
-                        <div class="page-header">
-                            <h2>✅ Карточка действий (Стр. 3/3)</h2>
-                            <div class="month-nav">
-                                <button id="prevMonth3">←</button>
-                                <select id="monthSelect3"></select>
-                                <select id="yearSelect3"></select>
-                                <button id="nextMonth3">→</button>
-                            </div>
-                        </div>
-                        
-                        <div class="habit-table-container">
-                            <table class="habit-table" id="habitTable3">
-                                <!-- Dynamically generated -->
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Page 5: Принцип паровоза (Train Principle) -->
-                <div class="page">
-                    <div class="page-content train-principle">
-                        <div class="page-header">
-                            <h2>🚂 Принцип паровоза</h2>
-                            <div class="date-nav">
-                                <button id="trainPrevDay">←</button>
-                                <input type="date" id="trainDate" />
-                                <button id="trainNextDay">→</button>
-                                <button id="trainToday">Сегодня</button>
-                            </div>
-                        </div>
-                        
-                        <div class="train-grid">
-                            <div class="train-header">
-                                <div class="time-header">Время</div>
-                                <div class="sphere-header">Физическая область</div>
-                                <div class="sphere-header">Семья</div>
-                                <div class="sphere-header">Работа/Бизнес</div>
-                                <div class="sphere-header">Самообразование/Духовность</div>
-                            </div>
-                            <div class="train-body" id="trainGrid">
-                                <!-- Dynamically generated -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Page 6: Годовой план (Annual Plan) -->
-                <div class="page">
-                    <div class="page-content annual-plan">
-                        <div class="page-header">
-                            <h2>📆 Годовой план</h2>
-                            <div class="year-nav">
-                                <button id="annualPrevYear">←</button>
-                                <select id="annualYearSelect">
-                                    <!-- Dynamically generated -->
-                                </select>
-                                <button id="annualNextYear">→</button>
-                            </div>
-                        </div>
-                        
-                        <div class="annual-table-container">
-                            <table class="annual-table" id="annualTable">
-                                <!-- Dynamically generated -->
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Page 7: Приоритетность задач (Priority Matrix) -->
-                <div class="page">
-                    <div class="page-content priority-matrix">
-                        <div class="page-header">
-                            <h2>🎯 Приоритетность задач</h2>
-                            <div class="week-nav">
-                                <button id="priorityPrevWeek">←</button>
-                                <span id="currentWeek">Неделя 1, 2026</span>
-                                <button id="priorityNextWeek">→</button>
-                                <button id="priorityThisWeek">Эта неделя</button>
-                            </div>
-                        </div>
-                        
-                        <div class="matrix-grid">
-                            <div class="quadrant urgent-important">
-                                <h3>A) 🔴 Важные срочные</h3>
-                                <p class="quadrant-desc">Квадрант результата</p>
-                                <div id="quadrantA">
-                                    <button class="add-task-btn" data-quadrant="A">+ Добавить задачу</button>
-                                </div>
-                            </div>
-                            <div class="quadrant important-not-urgent">
-                                <h3>B) 🟡 Важные не срочные</h3>
-                                <p class="quadrant-desc">Квадрант потенциала</p>
-                                <div id="quadrantB">
-                                    <button class="add-task-btn" data-quadrant="B">+ Добавить задачу</button>
-                                </div>
-                            </div>
-                            <div class="quadrant urgent-not-important">
-                                <h3>C) 🔵 Срочные не важные</h3>
-                                <p class="quadrant-desc">Квадрант структура (делегировать)</p>
-                                <div id="quadrantC">
-                                    <button class="add-task-btn" data-quadrant="C">+ Добавить задачу</button>
-                                </div>
-                            </div>
-                            <div class="quadrant not-urgent-not-important">
-                                <h3>D) ⚪ Не срочные не важные</h3>
-                                <p class="quadrant-desc">Квадрант убытков</p>
-                                <div id="quadrantD">
-                                    <button class="add-task-btn" data-quadrant="D">+ Добавить задачу</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Page 8: Лягушки (Frogs) -->
-                <div class="page">
-                    <div class="page-content frogs">
-                        <div class="page-header">
-                            <h2>🐸 Лягушки</h2>
-                            <div class="month-nav">
-                                <button id="frogsPrevMonth">←</button>
-                                <select id="frogsMonthSelect"></select>
-                                <select id="frogsYearSelect"></select>
-                                <button id="frogsNextMonth">→</button>
-                            </div>
-                        </div>
-                        
-                        <div class="frogs-content">
-                            <div class="frogs-section">
-                                <h3>Активные лягушки</h3>
-                                <div id="activeFrogs">
-                                    <button id="addFrog" class="add-btn">+ Добавить лягушку</button>
-                                </div>
-                            </div>
-                            
-                            <div class="frogs-section">
-                                <h3>Завершённые лягушки</h3>
-                                <div id="completedFrogs">
-                                    <!-- Completed frogs will be moved here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Page 9: Слоны (Elephants) -->
-                <div class="page">
-                    <div class="page-content elephants">
-                        <div class="page-header">
-                            <h2>🐘 Слоны</h2>
-                            <div class="elephants-tabs">
-                                <button class="tab-btn active" data-tab="active">Активные</button>
-                                <button class="tab-btn" data-tab="completed">Завершённые</button>
-                            </div>
-                        </div>
-                        
-                        <div class="elephants-content">
-                            <div class="tab-content active" id="activeElephants">
-                                <button id="addElephant" class="add-btn">+ Добавить слона</button>
-                            </div>
-                            
-                            <div class="tab-content" id="completedElephants">
-                                <!-- Completed elephants will be moved here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Page 10: Планы (Plans) -->
-                <div class="page">
-                    <div class="page-content plans">
-                        <div class="page-header">
-                            <h2>📋 Планы</h2>
-                        </div>
-                        
-                        <div class="plans-content">
-                            <div class="section">
-                                <h3>Годовой план</h3>
-                                <textarea id="yearlyGoals" class="lined-textarea" placeholder="Цели на год..."></textarea>
-                            </div>
-
-                            <div class="section">
-                                <h3>Месячный план</h3>
-                                <div class="month-nav">
-                                    <button id="plansPrevMonth">←</button>
-                                    <select id="plansMonthSelect"></select>
-                                    <select id="plansYearSelect"></select>
-                                    <button id="plansNextMonth">→</button>
-                                </div>
-                                <textarea id="monthlyGoals" class="lined-textarea" placeholder="Цели на месяц..."></textarea>
-                            </div>
-
-                            <div class="section">
-                                <h3>Недельный план</h3>
-                                <div class="week-nav">
-                                    <button id="plansPrevWeek">←</button>
-                                    <span id="plansCurrentWeek">Неделя 1, 2026</span>
-                                    <button id="plansNextWeek">→</button>
-                                </div>
-                                <div id="weeklyPlans">
-                                    <button id="addWeeklyTask" class="add-btn">+ Добавить задачу</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
