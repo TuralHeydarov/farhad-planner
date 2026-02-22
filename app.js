@@ -320,6 +320,10 @@ class FarhadPlanner {
         const dateKey = this.getDateKey(this.sectionPages.daily.current);
         const dayData = this.data.daily[dateKey] || {};
 
+        // Update inner date header
+        const dailyDate = document.getElementById('dailyDate');
+        if (dailyDate) dailyDate.textContent = this.formatDate(this.sectionPages.daily.current);
+
         // Load urgent tasks
         for (let i = 0; i < 5; i++) {
             const checkbox = document.getElementById(`urgent${i}`);
@@ -522,6 +526,9 @@ class FarhadPlanner {
         const monthKey = this.getMonthKey(this.sectionPages.actions.current);
         const actionsData = this.data.actions[monthKey] || {};
 
+        const actionsDate = document.getElementById('actionsDate');
+        if (actionsDate) actionsDate.textContent = this.formatMonth(this.sectionPages.actions.current);
+
         // Load direction items
         const itemInputs = document.querySelectorAll('[data-dir][data-item]:not([data-day])');
         itemInputs.forEach(input => {
@@ -606,6 +613,9 @@ class FarhadPlanner {
         const dateKey = this.getDateKey(this.sectionPages.locomotive.current);
         const locomotiveData = this.data.locomotive[dateKey] || {};
 
+        const locoDate = document.getElementById('locomotiveDate');
+        if (locoDate) locoDate.textContent = this.formatDate(this.sectionPages.locomotive.current);
+
         const textareas = document.querySelectorAll('#locomotiveGrid textarea');
         textareas.forEach(textarea => {
             const time = textarea.dataset.time;
@@ -656,6 +666,9 @@ class FarhadPlanner {
         const year = this.sectionPages.yearly.current.getFullYear();
         const yearlyData = this.data.yearly[year] || {};
 
+        const yearDate = document.getElementById('yearlyDate');
+        if (yearDate) yearDate.textContent = `${year} г.`;
+
         const inputs = document.querySelectorAll('#yearlyTable input');
         inputs.forEach(input => {
             const day = input.dataset.day;
@@ -688,6 +701,9 @@ class FarhadPlanner {
     loadPrioritiesData() {
         const weekKey = this.sectionPages.priorities.current;
         const prioritiesData = this.data.priorities[weekKey] || { A: [], B: [], C: [], D: [] };
+
+        const priDate = document.getElementById('prioritiesDate');
+        if (priDate) priDate.textContent = `Неделя ${weekKey}`;
 
         ['A', 'B', 'C', 'D'].forEach(quadrant => {
             const taskList = document.querySelector(`[data-quadrant="${quadrant}"]`);
@@ -748,6 +764,9 @@ class FarhadPlanner {
     loadFrogsData() {
         const monthKey = this.getMonthKey(this.sectionPages.frogs.current);
         const frogsData = this.data.frogs[monthKey] || { active: [], completed: [] };
+
+        const frogsDate = document.getElementById('frogsDate');
+        if (frogsDate) frogsDate.textContent = this.formatMonth(this.sectionPages.frogs.current);
 
         this.renderFrogs('activeFrogs', frogsData.active);
         this.renderFrogs('completedFrogs', frogsData.completed);
@@ -959,6 +978,9 @@ class FarhadPlanner {
 
     loadPlansData() {
         const weekKey = this.sectionPages.plans.current;
+
+        const plansDate = document.getElementById('plansDate');
+        if (plansDate) plansDate.textContent = `Неделя ${weekKey}`;
 
         // Load year plan
         const yearPlan = document.getElementById('yearPlan');
