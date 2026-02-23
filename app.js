@@ -124,6 +124,12 @@ class FarhadPlanner {
                 }
             }
 
+            // Disable swipe on sections with tables (use buttons only)
+            const noSwipeSections = ['actions', 'locomotive', 'yearly'];
+            if (noSwipeSections.includes(this.currentSection)) {
+                return;
+            }
+
             if (swipeDistanceX > 0) {
                 // Swipe left = next
                 this.navigatePage('next');
@@ -663,7 +669,8 @@ class FarhadPlanner {
             directions.forEach((direction, dirIndex) => {
                 const cell = document.createElement('div');
                 cell.className = 'grid-cell';
-                cell.innerHTML = `<textarea data-time="${timeIndex}" data-dir="${dirIndex}" placeholder="Планы на ${timeSlot} - ${direction}"></textarea>`;
+                cell.setAttribute('data-direction', direction);
+                cell.innerHTML = `<textarea data-time="${timeIndex}" data-dir="${dirIndex}" placeholder="..."></textarea>`;
                 row.appendChild(cell);
             });
 

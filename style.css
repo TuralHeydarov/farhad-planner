@@ -455,6 +455,8 @@ button:active {
     color: var(--accent-primary);
     margin-bottom: 0.25rem;
     font-size: 0.9rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .text-section textarea {
@@ -999,13 +1001,85 @@ button:active {
         margin-bottom: 1.5rem;
     }
     
+    /* Daily planner - reflection fields: labels above inputs */
+    .daily-right .text-section {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .daily-right .text-section label,
+    .daily-right .text-section strong,
+    .daily-right .text-section b {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        font-size: 0.85rem;
+    }
+    
     .daily-right .text-section textarea {
         min-height: 40px;
+        width: 100% !important;
+    }
+    
+    /* Daily left/right columns stack vertically */
+    .daily-content {
+        display: block !important;
+    }
+    
+    .daily-left, .daily-right {
+        width: 100% !important;
+        max-width: 100% !important;
     }
     
     .actions-table,
     .yearly-table {
         font-size: 0.75rem;
+    }
+    
+    /* Принцип паровоза — vertical cards on mobile */
+    .locomotive-grid .grid-header {
+        display: none;
+    }
+    
+    .locomotive-grid .grid-body {
+        display: block !important;
+        grid-template-columns: unset !important;
+    }
+    
+    .locomotive-grid .grid-row {
+        display: block !important;
+        border: 1px solid var(--paper-border);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: var(--paper-bg);
+    }
+    
+    .locomotive-grid .time-col {
+        display: block;
+        text-align: left;
+        padding: 0.5rem 0;
+        font-size: 1.1rem;
+        border-bottom: 1px solid var(--paper-border);
+        margin-bottom: 0.5rem;
+    }
+    
+    .locomotive-grid .grid-cell {
+        display: block;
+        min-height: auto;
+        padding: 0.25rem 0;
+    }
+    
+    .locomotive-grid .grid-cell::before {
+        content: attr(data-direction);
+        display: block;
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: var(--accent-primary);
+        margin-bottom: 0.25rem;
+    }
+    
+    .locomotive-grid .grid-cell textarea {
+        height: 50px;
     }
     
     .quadrant {
@@ -1014,6 +1088,15 @@ button:active {
     
     .priorities-grid {
         gap: 0.75rem;
+    }
+    
+    .subtask-input {
+        grid-template-columns: 1fr;
+    }
+    
+    .subtask {
+        grid-template-columns: auto 1fr auto;
+        font-size: 0.85rem;
     }
 }
 
